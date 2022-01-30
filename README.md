@@ -22,11 +22,25 @@ Add the ghosts : First, we need to add the starting positions of our ghosts.
 
 ## How to run
 
-Just run main.py after installing dependencies!
+Just run main.py after installing dependencies! Move Pacman using the arrow keys.
 
 ## Game rules
 
-* The objective is to increase 
+* The objective is to score as many points as possible, while avoiding dying
+* Pacman has an associated quantum state, and the ghosts perform measurements in X, Y or Z basis. If the measurement result is a 0, Pacman dies. If it's a one, Pacman starts in the post-measurement state. The measurement results and post measurement states are obtained by running the relevant code on a real IonQ quantum computer, accessed via Azure!
+* There are gates strewn throughout the maze. If Pacman meets an X, Y or Z gate, the gate acts on the Pacman's state, and Pacman then is in the state obtained after the gate acts. 
+* The gates and ghosts disappear after interacting with Pacman.
+* The score is increased by CNOT and H gates, which allows Pacman to generate maximally entangled 2-qubit states.
+
+# Screenshots 
+
+![Main gameplay window](/screenshots/gameplay_1.png)
+
+![Score increment after Pacman swallows an H gate](/screenshots/gameplay_2.png)
+
+![Measurement being run on an IonQ quantum computer](/screenshots/gameplay_3.png)
+
+![Post death :D](/screenshots/gameplay_4.png)
 
 
 
