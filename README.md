@@ -2,7 +2,7 @@
 
 <!--PacMan has been designed originally as an antidote to the games with violent themes. This game is very simple yet alluring to be used for educational purposes. Pacman eats dots in a maze to score points. It avoids the ghosts to be alive in the game. In return it increase the cumulative score.-->
 
-We have utilized the simple game of Pacman to illustrate and understand the complex concepts of Quantum Mechanics. We made this for IQuHACK 2022!
+We have utilized the simple game of Pacman to illustrate and understand the complex concepts of Quantum Mechanics. We made this for the **IonQ + Microsoft Joint Challenge @ MIT iQuHACK 2022**!
 
 <!--
 Setup:
@@ -47,14 +47,25 @@ PacMan has been designed originally as an antidote to the games with violent the
 
 We have utilized this simple game to understand the complex concepts of Quantum Mechanics.
 
-# Steps: PAQman
+## Steps: PAQman
 
 1. Setup:
 2. Draw the maze : This function sets the background of the screen for starting the game.
 3. Draw PAQman : We need to set a starting position and direction for PacMan.
 4. Move PAQman
-5. Increase the score : When PAQman moves over a dot, the score increases by one, and the dot is removed.
-6. Add the ghosts : First, we need to add the starting positions of our ghosts.
+5. Increase the score : When PAQman moves over an H gate or a CNOT gate, the score increases by one, and the dot is removed.
+6. Add the ghosts : We add the starting positions of our ghosts. Ghosts generate randomly on any empty starting square, and move in their current direction as long as it is legal. When such movement is not legal, it picks one of the available directions.
+7. Add the gates: the gates also spawn randomly on any available open position. We have ensured that two gates are not generated at the same point.
+
+## Future Directions
+
+* Since Pacman can use H and CNOT gates to generate Bell pairs, it can run a teleportation protocol between two points. This adds another quantum aspect to the game
+* Currently the game has no lives counter, we can add that. 
+* We can add other gates like rotation gates
+* We can add advanced levels
+* We can treat multiqubit states that will add new gates and gameplay features
+* We can make the ghosts emply search algorithms for Pacman, currently they just move randomly.
+
 
 
 
