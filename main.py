@@ -2,8 +2,8 @@ import pygame, sys
 from pygame.locals import *
 import random
 import time
-import tkinter as tk
-from tkinter import *
+# import tkinter as tk
+# from tkinter import *
 from Quantum_Measure import *
 from random import choice
 
@@ -397,28 +397,28 @@ def victory():
     pygame.quit()
     sys.exit()
 
-def popup(gates, simulator, playerCircuit, quantumRotDict, quantumGateDict, state):
-    window = Tk()
-    window.title("IQuHACK")
-    window.resizable(width=FALSE, height=FALSE)
-    window.geometry('{}x{}'.format(200, 150))
-    window.grid_rowconfigure(0, weight=1)
-    window.grid_rowconfigure(1, weight=0)
-    window.grid_columnconfigure(0, weight=0)
-    frame = Frame(window)
-    frame.grid(row = 0, column = 0)
-    frame.grid_columnconfigure(0, weight=0)
-    frame.grid_columnconfigure(1, weight=0)
-    frame.grid_columnconfigure(2, weight=0)
-    label = Label(frame, text = "Please wait while you are measured!").grid(row = 0, column = 1)
-    img = PhotoImage(file="Enemy.png")
-    label2 = Label(window, image = img)
-    label2.grid(row = 1, column = 0)
-    verAlive = execute_measurement(gates, simulator, playerCircuit, quantumRotDict, quantumGateDict, state)
-    time.sleep(5)
-    window.destroy()
-    window.mainloop()
-    return verAlive
+# def popup(gates, simulator, playerCircuit, quantumRotDict, quantumGateDict, state):
+#     window = Tk()
+#     window.title("IQuHACK")
+#     window.resizable(width=FALSE, height=FALSE)
+#     window.geometry('{}x{}'.format(200, 150))
+#     window.grid_rowconfigure(0, weight=1)
+#     window.grid_rowconfigure(1, weight=0)
+#     window.grid_columnconfigure(0, weight=0)
+#     frame = Frame(window)
+#     frame.grid(row = 0, column = 0)
+#     frame.grid_columnconfigure(0, weight=0)
+#     frame.grid_columnconfigure(1, weight=0)
+#     frame.grid_columnconfigure(2, weight=0)
+#     label = Label(frame, text = "Please wait while you are measured!").grid(row = 0, column = 1)
+#     img = PhotoImage(file="Enemy.png")
+#     label2 = Label(window, image = img)
+#     label2.grid(row = 1, column = 0)
+#     verAlive = execute_measurement(gates, simulator, playerCircuit, quantumRotDict, quantumGateDict, state)
+#     time.sleep(5)
+#     window.destroy()
+#     window.mainloop()
+#     return verAlive
 
 def pgpopup(surface, gates, simulator, playerCircuit, quantumRotDict, quantumGateDict, state):
     surface.fill(BLACK)
@@ -461,6 +461,7 @@ while True:
     if pygame.sprite.spritecollideany(P1, enemies):
         if P1.is_collided_with(E1):
             if POPUP == 'TKINTER':
+                continue
                 verAlive = popup(P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E1.kind)
             elif POPUP == 'PYGAME':
                 verAlive = pgpopup(DISPLAYSURF, P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E1.kind)
@@ -473,6 +474,7 @@ while True:
 
         elif P1.is_collided_with(E2):
             if POPUP == 'TKINTER':
+                continue
                 verAlive = popup(P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E2.kind)
             elif POPUP == 'PYGAME':
                 verAlive = pgpopup(DISPLAYSURF, P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E2.kind)
@@ -485,6 +487,7 @@ while True:
 
         elif P1.is_collided_with(E3):
             if POPUP == 'TKINTER':
+                continue
                 verAlive = popup(P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E3.kind)
             elif POPUP == 'PYGAME':
                 verAlive = pgpopup(DISPLAYSURF, P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E3.kind)
@@ -497,6 +500,7 @@ while True:
 
         elif P1.is_collided_with(E4):
             if POPUP == 'TKINTER':
+                continue
                 verAlive = popup(P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E4.kind)
             elif POPUP == 'PYGAME':
                 verAlive = pgpopup(DISPLAYSURF, P1.qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, E4.kind)
