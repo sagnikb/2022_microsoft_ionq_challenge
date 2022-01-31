@@ -8,30 +8,25 @@ from azure.quantum.qiskit import AzureQuantumProvider
 from qiskit import Aer
 import time
 
-listaTeste = ["Hadamard", "PauliZ", "RX"]
-
-
 def initialize(level):
-    #Connections for the Azure Quantum simulator
-    provider = AzureQuantumProvider(
-    resource_id="/subscriptions/b1d7f7f8-743f-458e-b3a0-3e09734d716d/resourceGroups/aq-hackathons/providers/Microsoft.Quantum/Workspaces/aq-hackathon-01", 
-    location="East US"
-    )
-    #print([backend.name() for backend in provider.backends()])
-    simulator = provider.get_backend("ionq.simulator")
-    # simulator = Aer.get_backend('statevector_simulator')
+    # #Connections for the Azure Quantum simulator
+    # provider = AzureQuantumProvider(
+    # resource_id="/subscriptions/b1d7f7f8-743f-458e-b3a0-3e09734d716d/resourceGroups/aq-hackathons/providers/Microsoft.Quantum/Workspaces/aq-hackathon-01", 
+    # location="East US"
+    # )
+    # #print([backend.name() for backend in provider.backends()])
+    # simulator = provider.get_backend("ionq.simulator")
+    simulator = Aer.get_backend('statevector_simulator')
     
-    #Game circuit generations, both for the player circuit and the score circuit
+    # Game circuit generations, both for the player circuit and the score circuit
     scoreCircuit = QuantumCircuit(level+2, level+2)
     playerCircuit = QuantumCircuit(1,1)
     
-    #Dictionary with the relation of gates present in game and the command, used for verification of which have been collected at execute measurement
-    quantumGateDict= {"Hadamard": playerCircuit.h , "PauliX": playerCircuit.x,
-                "PauliY": playerCircuit.y, "PauliZ": playerCircuit.z,}
+    # Dictionary with the relation of gates present in game and the command
+    # used for verification of which have been collected at execute measurement
+    quantumGateDict= {'H': playerCircuit.h , 'X': playerCircuit.x, 'Y': playerCircuit.y, 'Z': playerCircuit.z,}
 
-    quantumRotDict= {"RX": playerCircuit.rx, "RY":playerCircuit.ry, "RZ":playerCircuit.rz}
-
-    return scoreCircuit, playerCircuit, quantumGateDict, quantumRotDict, simulator
+    return scoreCircuit, playerCircuit, quantumGateDict, simulator
 
 def execute_measurement(qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, measurement):
     #Reset the circuit so we can update it fresh in case of a second encounter.
@@ -44,7 +39,8 @@ def execute_measurement(qGates, simulator, playerCircuit, quantumRotDict, quantu
         if gate in quantumRotDict:
             quantumRotDict[gate](np.pi/2, 0)
             
-    #Verify which measurement basis will we use according to the parameter sent (type of enemy)
+    # Verify which measurement basis will we use according to the parameter sent 
+    # (type of enemy)
     if measurement == "Z":
         playerCircuit.measure(0, 0)
     elif measurement == "Y":
@@ -71,25 +67,21 @@ def execute_measurement(qGates, simulator, playerCircuit, quantumRotDict, quantu
     else:
         return 1
 
-#Function for the score circuit. If you generate a maximally entalgled state, you win.
+# Function for the score circuit. If you generate a maximally entalgled state, 
+# you win.
 def Score_circuit(gate, scoreCircuit, score, scorelist):
     cnot_count = 0
     for i in range(2):
         scoreCircuit.reset(i)
-    if gate == "H":
+    if gate == 'H':
         score += 1
     else:
-        if "H" in scorelist:
+        if 'H' in scorelist:
             score += 1
     for gates in scorelist:
-        if gates == "H":
+        if gates == 'H':
             scoreCircuit.h(0)
         else:
             scoreCircuit.cnot(cnot_count, cnot_count+ 1)
             cnot_count += 1
     return score, scoreCircuit                         
-
-#scoreCircuit, playerCircuit, quantumGateDict, quantumRotDict, simulator = initialize()
-
-#execute_measurement(listaTeste)
-#playerCircuit.draw(output = 'mpl')
