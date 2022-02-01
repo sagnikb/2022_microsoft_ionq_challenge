@@ -28,7 +28,7 @@ def initialize(level):
 
     return scoreCircuit, playerCircuit, quantumGateDict, simulator
 
-def execute_measurement(qGates, simulator, playerCircuit, quantumRotDict, quantumGateDict, measurement):
+def execute_measurement(qGates, simulator, playerCircuit, quantumGateDict, measurement):
     #Reset the circuit so we can update it fresh in case of a second encounter.
     playerCircuit.reset(0)
     
@@ -36,8 +36,6 @@ def execute_measurement(qGates, simulator, playerCircuit, quantumRotDict, quantu
     for gate in qGates:
         if gate in quantumGateDict:
             quantumGateDict[gate](0)
-        if gate in quantumRotDict:
-            quantumRotDict[gate](np.pi/2, 0)
             
     # Verify which measurement basis will we use according to the parameter sent 
     # (type of enemy)
