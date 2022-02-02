@@ -3,7 +3,7 @@ import pygame
 import sys
 from pygame.locals import *
 import time
-from Quantum_Measure import *
+from Quantum_Measure import QuantumBackend
 from random import choice
 import copy
 
@@ -203,11 +203,10 @@ class Game():
         Gate('H')
         Gate('CN')
     def __init__(self) -> None:
-        self.scoreCircuit, self.playerCircuit, self.quantumGateDict, self.simulator = initialize(0)
+        self.quantumbackend = QuantumBackend(0)
         self.scorelist = []
         self.frame = 0
         self.score = 0
-        print('game initialized')
 
     def draw(self):
         for row_id, row in enumerate(TILES):
@@ -257,7 +256,7 @@ class Game():
                                     WHITE)
         DISPLAYSURF.blit(txt, (300, 300))
         pygame.display.update()
-        verAlive = execute_measurement(player.qGates, self.simulator, self.playerCircuit, self.quantumGateDict, enemy.kind)
+        verAlive = self.quantumbackend.execute_measurement(player.qGates, enemy.kind)
         time.sleep(2)
         txt2 = pygame.font.Font.render(
                                     GAME_FONT_LARGE, 
@@ -288,7 +287,12 @@ class Game():
                     if verAlive == 0:
                         self.die()
                     else:
-                        self.P1.qGates = ['X']  # TODO: Change this to whatever gate gives the post measurement state we want
+                        if enemy.kind == 'Z':
+                            self.P1.qGates = ['X']
+                        elif enemy.kind == 'X':
+                            self.P1.qgates = ['X', 'H']
+                        elif enemy.kind == 'Y':
+                            self.P1.gates = ['X', 'H', 'S']
                         enemy.kill()
                         continue
             gate_collision = pygame.sprite.spritecollide(self.P1, Gate.all_gates, False)
@@ -296,10 +300,10 @@ class Game():
                 for gate in gate_collision:
                     if gate.kind == 'H':
                         self.scorelist.append('H')
-                        self.score, self.scoreCircuit = Score_circuit('H', self.scoreCircuit, self.score, self.scorelist)
+                        self.score, self.scoreCircuit = self.quantumbackend.Score_circuit('H', self.score, self.scorelist)
                     elif gate.kind == 'CN':
                         self.scorelist.append('CN')
-                        self.score, self.scoreCircuit = Score_circuit('CN', self.scoreCircuit, self.score, self.scorelist)
+                        self.score, self.scoreCircuit = self.quantumbackend.Score_circuit('CN', self.score, self.scorelist)
                     self.P1.qGates.append(gate.kind)
                     gate.kill()
                     if self.score == 2:
