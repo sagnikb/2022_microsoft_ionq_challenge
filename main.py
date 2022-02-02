@@ -28,8 +28,6 @@ NUMBER_OF_GHOSTS = 5
 FPS = 10
 
 pygame.init()
-scoreCircuit, playerCircuit, quantumGateDict, simulator = initialize(0)
-
 GAME_FONT = pygame.font.SysFont('Arial', 20)
 GAME_FONT_LARGE = pygame.font.SysFont('Arial', 30)
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_WIDTH))
@@ -72,10 +70,9 @@ class Sprite(pygame.sprite.Sprite):
         return (self.rect.center[1]//SMALL_SQ_DIM, 
                                     self.rect.center[0]//SMALL_SQ_DIM)
 
-    @staticmethod
-    def random_empty_cell():
+    def random_empty_cell(self):
         tiles_copy = copy.deepcopy(TILES)
-        for sprite in Sprite.all_sprites:
+        for sprite in self.all_sprites:
             tiles_copy[sprite.current_tile[1]][sprite.current_tile[0]] = 'X'
         gen_row = choice(list(range(2,19)))
         indices = [i for i, col in enumerate(tiles_copy[gen_row]) if col == 1]
@@ -102,7 +99,7 @@ class Enemy(Sprite):
         self.rect.center = self.tiles2center(self.random_empty_cell())
         self.currentdir = (0, 0, 0, 1)
 
-    def move(self):
+    def move(self, frame):
         if not frame:
             legal = []  # top = 0, down = 1, left = 2, right = 3
             (cur_row, cur_col) = (self.rect.center[1]//SMALL_SQ_DIM, 
@@ -196,132 +193,121 @@ class Gate(Sprite):
         surface.blit(txt, (self.rect.centerx - SMALL_SQ_DIM/5, 
                                         self.rect.centery - SMALL_SQ_DIM/5))
 
-
-def drawMaze(surface):
-    for row_id, row in enumerate(TILES):
-        for col_id, col in enumerate(row):
-            if col == 0:
-                pygame.draw.rect(surface, WHITE, pygame.Rect(
-                    SMALL_SQ_DIM*col_id, 
-                    SMALL_SQ_DIM*row_id, 
-                    SMALL_SQ_DIM, 
-                    SMALL_SQ_DIM
-                    )
-                )
-
-# TODO: Create a proper game class
-
 class Game():
+    P1 = Pacman()
+    for i in range(NUMBER_OF_GHOSTS):
+        Enemy(choice(GHOSTS))
+    for i in range(NUMBER_OF_GATES):
+        Gate(choice(GATES))
+    for i in range(NUMBER_OF_SCORE_GATES):
+        Gate('H')
+        Gate('CN')
     def __init__(self) -> None:
-        pass
+        self.scoreCircuit, self.playerCircuit, self.quantumGateDict, self.simulator = initialize(0)
+        self.scorelist = []
+        self.frame = 0
+        self.score = 0
+        print('game initialized')
 
-P1 = Pacman()
-for i in range(NUMBER_OF_GHOSTS):
-    Enemy(choice(GHOSTS))
-for i in range(NUMBER_OF_GATES):
-    Gate(choice(GATES))
-for i in range(NUMBER_OF_SCORE_GATES):
-    Gate('H')
-    Gate('CN')
+    def draw(self):
+        for row_id, row in enumerate(TILES):
+            for col_id, col in enumerate(row):
+                if col == 0:
+                    pygame.draw.rect(DISPLAYSURF, WHITE, pygame.Rect(
+                        SMALL_SQ_DIM*col_id, 
+                        SMALL_SQ_DIM*row_id, 
+                        SMALL_SQ_DIM, 
+                        SMALL_SQ_DIM
+                        )
+                    )
+        txt = pygame.font.Font.render(GAME_FONT_LARGE, "SCORE:" + str(self.score), True, RED)
+        DISPLAYSURF.blit(txt, (860, 960))
+        for entity in Sprite.all_sprites:
+            entity.draw(DISPLAYSURF)
 
-def finish_game():
-    time.sleep(2)
-    for entity in Sprite.all_sprites:
-        entity.kill() 
-    pygame.quit()
-    sys.exit()
+    def finish_game(self):
+        time.sleep(2)
+        pygame.quit()
+        sys.exit()
 
+    def die(self):
+        DISPLAYSURF.fill(BLACK)
+        txt = pygame.font.Font.render(
+                                    GAME_FONT_LARGE, 
+                                    "You just died :D", 
+                                    True, 
+                                    WHITE)
+        DISPLAYSURF.blit(txt, (300, 400))
+        pygame.display.update()
+        self.finish_game()
 
-def die():
-    DISPLAYSURF.fill(BLACK)
-    txt = pygame.font.Font.render(
-                                GAME_FONT_LARGE, 
-                                "You just died :D", 
-                                True, 
-                                WHITE)
-    DISPLAYSURF.blit(txt, (300, 400))
-    pygame.display.update()
-    finish_game()
+    def victory(self):
+        DISPLAYSURF.fill(BLACK)
+        txt = pygame.font.Font.render(GAME_FONT_LARGE, "YOU WON! :D", True, WHITE)
+        DISPLAYSURF.blit(txt, (300, 400))
+        pygame.display.update()
+        self.finish_game()
 
+    def measurement(self, player: Pacman, enemy: Enemy) -> int:
+        DISPLAYSURF.fill(BLACK)
+        txt = pygame.font.Font.render(
+                                    GAME_FONT_LARGE, 
+                                    "You're being measured now!", 
+                                    True, 
+                                    WHITE)
+        DISPLAYSURF.blit(txt, (300, 300))
+        pygame.display.update()
+        verAlive = execute_measurement(player.qGates, self.simulator, self.playerCircuit, self.quantumGateDict, enemy.kind)
+        time.sleep(2)
+        txt2 = pygame.font.Font.render(
+                                    GAME_FONT_LARGE, 
+                                    "Measurement result is... "+str(verAlive), 
+                                    True, 
+                                    WHITE)
+        DISPLAYSURF.blit(txt2, (300, 400))
+        pygame.display.update()
+        time.sleep(2)
+        return verAlive
 
-def victory():
-    DISPLAYSURF.fill(BLACK)
-    txt = pygame.font.Font.render(GAME_FONT_LARGE, "YOU WON! :D", True, WHITE)
-    DISPLAYSURF.blit(txt, (300, 400))
-    pygame.display.update()
-    finish_game()
+    def main_loop(self):
+        while True:
+            self.draw()
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+            for enemy in Enemy.all_enemies:
+                enemy.move(game.frame)
+            self.P1.update()
+            pygame.display.update()
+            DISPLAYSURF.fill(BLACK)
+            enemy_collision = pygame.sprite.spritecollide(self.P1, Enemy.all_enemies, False)
+            if enemy_collision:
+                for enemy in enemy_collision:
+                    verAlive = self.measurement(self.P1, enemy)
+                    if verAlive == 0:
+                        self.die()
+                    else:
+                        self.P1.qGates = ['X']  # TODO: Change this to whatever gate gives the post measurement state we want
+                        enemy.kill()
+                        continue
+            gate_collision = pygame.sprite.spritecollide(self.P1, Gate.all_gates, False)
+            if gate_collision:
+                for gate in gate_collision:
+                    if gate.kind == 'H':
+                        self.scorelist.append('H')
+                        self.score, self.scoreCircuit = Score_circuit('H', self.scoreCircuit, self.score, self.scorelist)
+                    elif gate.kind == 'CN':
+                        self.scorelist.append('CN')
+                        self.score, self.scoreCircuit = Score_circuit('CN', self.scoreCircuit, self.score, self.scorelist)
+                    self.P1.qGates.append(gate.kind)
+                    gate.kill()
+                    if self.score == 2:
+                        self.victory()
+            self.frame += 1
+            self.frame = self.frame % 4
+            FramePerSec.tick(FPS)
 
-
-def measurement(surface, gates, simulator, playerCircuit, quantumGateDict, state):
-    surface.fill(BLACK)
-    txt = pygame.font.Font.render(
-                                GAME_FONT_LARGE, 
-                                "You're being measured now!", 
-                                True, 
-                                WHITE)
-    surface.blit(txt, (300, 300))
-    pygame.display.update()
-    verAlive = execute_measurement(gates, simulator, playerCircuit, quantumGateDict, state)
-    time.sleep(2)
-    txt2 = pygame.font.Font.render(
-                                GAME_FONT_LARGE, 
-                                "Measurement result is... "+str(verAlive), 
-                                True, 
-                                WHITE)
-    surface.blit(txt2, (300, 400))
-    pygame.display.update()
-    time.sleep(2)
-    return verAlive
-
-
-frame = 0
-score = 0
-scorelist = []
-while True:
-    drawMaze(DISPLAYSURF)
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-
-    for enemy in Enemy.all_enemies:
-        enemy.move()
-    
-    txt = pygame.font.Font.render(GAME_FONT_LARGE, "SCORE:" + str(score), True, RED)
-    DISPLAYSURF.blit(txt, (860, 960))
-    P1.update()
-    pygame.display.update()
-    DISPLAYSURF.fill(BLACK)
-    
-    for entity in Sprite.all_sprites:
-        entity.draw(DISPLAYSURF)
-
-    enemy_collision = pygame.sprite.spritecollide(P1, Enemy.all_enemies, False)
-    if enemy_collision:
-        for enemy in enemy_collision:
-            verAlive = measurement(DISPLAYSURF, P1.qGates, simulator, playerCircuit, quantumGateDict, enemy.kind)
-            if verAlive == 0:
-                die()
-            else:
-                P1.qGates = ["PauliX"]  # TODO: Change this to whatever gate gives the post measurement state we want
-                enemy.kill()
-                continue
-
-    gate_collision = pygame.sprite.spritecollide(P1, Gate.all_gates, False)
-    if gate_collision:
-        for gate in gate_collision:
-            if gate.kind == 'H':
-                scorelist.append('H')
-                score, scoreCircuit = Score_circuit('H', scoreCircuit, score, scorelist)
-            elif gate.kind == 'CN':
-                scorelist.append('CN')
-                score, scoreCircuit = Score_circuit('CN', scoreCircuit, score, scorelist)
-            P1.qGates.append(gate.kind)
-            gate.kill()
-            if score == 2:
-                victory()
-
-    # pygame.display.update()
-    frame += 1
-    frame = frame % 4
-    FramePerSec.tick(FPS)
+if __name__ == "__main__":
+    game = Game()
+    game.main_loop()
