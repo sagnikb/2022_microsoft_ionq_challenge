@@ -1,6 +1,6 @@
 # PAQ-MAN - PAC-MAN with a quantum flavor
 
-We have utilized the simple game of Pacman to illustrate and understand the complex concepts of Quantum Mechanics. We made this for the **IonQ + Microsoft Joint Challenge @ MIT iQuHACK 2022** [https://www.iquise.mit.edu/iQuHACK/2022-01-28](iQuHACK 2022)!
+We have utilized the simple game of Pacman to illustrate and understand the complex concepts of Quantum Mechanics. We made this for the **IonQ + Microsoft Joint Challenge @ MIT iQuHACK 2022** [iQuHACK 2022](https://www.iquise.mit.edu/iQuHACK/2022-01-28)!
 
 ## Dependencies
 
